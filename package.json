@@ -1,0 +1,27 @@
+{
+  "name": "statpad",
+  "version": "0.0.1",
+  "description": "Toolkit for your day-to-day fantasy basketball operations",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "fantasy",
+    "basketball",
+    "roto",
+    "yahoo",
+    "nba",
+    "stats"
+  ],
+  "author": "Gali Armero",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "mongoose": "^5.4.1",
+    "passport": "^0.4.0",
+    "passport-oauth2": "^1.4.0"
+  }
+}
