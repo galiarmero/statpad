@@ -20,44 +20,48 @@ passport.use('yahoo', new OAuth2Strategy({
             },
             responseType: 'json'
         }).then(response => {
-            let userProfile = response.data.profile;
+            let newUser = response.data.profile;
             // Check if user already logged in before
-            User.findByProviderAndProfileId('yahoo', userProfile.guid).then(currentUser => {
-                if (currentUser) {
-                    // If old user, update login-related fields
-                    updateUserLoginStats(currentUser);
+            User.findByProviderAndProfileId('yahoo', newUser.guid).then(oldUser => {
+                if (oldUser) {
+                    updateUserLoginStats(oldUser, done);
                 } else {
-                    // If new user, insert in DB
-                    createNewUser(userProfile);
+                    createNewUser(newUser, done);
                 }
             })
         }).catch(err => {
+            console.log(`Error fetching user profile for ${params.xoauth_yahoo_guid}`)
             console.log(err)
+            return done()
         })
     })
 )
 
-const updateUserLoginStats = (currentUser) => {
-    currentUser.set({ lastLogin: Date.now(), loginCount: currentUser.loginCount + 1 });
-    currentUser.save().then(updatedUser => {
+const updateUserLoginStats = (user, done) => {
+    user.set({ lastLogin: Date.now(), loginCount: user.loginCount + 1 });
+    user.save().then(updatedUser => {
         console.log(`Updated login stats for ${updatedUser.profileId}`);
+        return done(null, updatedUser);
     }).catch(err => {
         console.log('Error updating user login stats');
         console.log(err);
+        return done(null, user);
     })
 }
 
-const createNewUser = (userProfile) => {
+const createNewUser = (user, done) => {
     new User({
         provider: 'yahoo',
-        profileId: userProfile.guid,
-        name: userProfile.nickname,
-        imageUrl: userProfile.image.imageUrl,
+        profileId: user.guid,
+        name: user.nickname,
+        imageUrl: user.image.imageUrl,
     }).save().then(newUser => {
         console.log(`New ${newUser.provider} user '${newUser.profileId}' inserted`);
+        return done(null, newUser);
     }).catch(err => {
         console.log('Error creating user');
         console.log(err);
+        return done(err);
     })
 }
 

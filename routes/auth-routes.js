@@ -8,9 +8,8 @@ router.get('/yahoo/callback', (req, res, next) => {
     console.log("In callback")
     passport.authenticate('yahoo', (err, user, info) => {
         if (err) { return next(err); }
-        console.log("No err in callback")
-
-        // TODO: Handle user login
+        
+        res.send(user)
     })(req, res, next);
 })
 
